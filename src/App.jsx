@@ -1,33 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import axios from 'axios'
+import { Routes, Route } from 'react-router-dom'
+import Players from './Players'
+import Player from './Player'
+import Form from './Form'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [players, setPlayers] = useState([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const getPlayers = async() => {
+      const data = await axios.get("https://fsa-puppy-bowl.herokuapp.com/api/2307-ftb-et-web-ft/players")
+      setPlayers(data.data.data.players)
+    }
+    getPlayers()
+    setLoading(false)
+  }, [players])
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <header>
+      <h1>Welcome to the Puppy Bowl!</h1>
+      <Form setPlayers={setPlayers}/>
+      <hr />
+    </header>
+      <Routes>
+        <Route path='/' element={<Players players={players} loading={loading}/>}/>
+        <Route path={`/:id`} element={<Player setLoading={setLoading} players={players} setPlayers={setPlayers} />} />
+      </Routes>
     </>
   )
 }
